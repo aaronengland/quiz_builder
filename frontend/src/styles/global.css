@@ -158,6 +158,52 @@ body {
   margin-top: 0.75rem;
 }
 
+/* Home Page */
+.hero {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.hero h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: var(--gray-500);
+  font-size: 1.05rem;
+}
+
+.generate-form {
+  margin-bottom: 1.5rem;
+}
+
+.input-group {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.topic-input {
+  flex: 1;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.topic-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.topic-input::placeholder {
+  color: var(--gray-300);
+}
+
 /* Cards */
 .card {
   background: white;
@@ -176,5 +222,13 @@ body {
 
   .container {
     padding: 1.5rem 1rem;
+  }
+
+  .input-group {
+    flex-direction: column;
+  }
+
+  .hero h1 {
+    font-size: 1.5rem;
   }
 }
