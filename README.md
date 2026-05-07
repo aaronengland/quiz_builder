@@ -1,5 +1,7 @@
 # Quiz Builder - AI-Powered Knowledge Quiz Generator
 
+**[Live Demo](https://6s9kx6uqpp.us-west-2.awsapprunner.com/)**
+
 An MVP web application that generates multiple-choice quizzes on any topic using AI. Built with FastAPI, React, and Claude Sonnet 4.5 via AWS Bedrock.
 
 ## Project Structure
