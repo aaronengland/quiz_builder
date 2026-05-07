@@ -439,6 +439,59 @@ body {
   padding: 1.5rem 0;
 }
 
+/* History Page */
+.history-page h2 {
+  margin-bottom: 1.5rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: var(--gray-500);
+}
+
+.empty-state p {
+  margin-bottom: 1rem;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.history-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  box-shadow: var(--shadow);
+}
+
+.history-info h3 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.history-date {
+  color: var(--gray-500);
+  font-size: 0.8rem;
+}
+
+.history-score {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--primary);
+}
+
+.history-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
 /* Cards */
 .card {
   background: white;
@@ -471,5 +524,11 @@ body {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.25rem;
+  }
+
+  .history-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
   }
 }
