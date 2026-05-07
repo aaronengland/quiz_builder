@@ -1,6 +1,13 @@
 # instructions
 instructions/
 
+# SQLite database
+*.db
+
+# Frontend build artifacts
+frontend/dist/
+frontend/node_modules/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
