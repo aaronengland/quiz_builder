@@ -55,7 +55,7 @@ async def generate_quiz(topic: str, bedrock_client) -> list[dict]:
     prompt = _build_prompt(topic, wiki_context)
 
     response = bedrock_client.converse(
-        modelId="us.anthropic.claude-sonnet-4-20250514-v1:0",
+        modelId="us.anthropic.claude-sonnet-4-5-20250929-v1:0",
         messages=[{"role": "user", "content": [{"text": prompt}]}],
         inferenceConfig={"maxTokens": 2048},
     )

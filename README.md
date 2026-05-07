@@ -1,6 +1,6 @@
 # Quiz Builder - AI-Powered Knowledge Quiz Generator
 
-An MVP web application that generates multiple-choice quizzes on any topic using AI. Built with FastAPI, React, and Claude Sonnet 4 via AWS Bedrock.
+An MVP web application that generates multiple-choice quizzes on any topic using AI. Built with FastAPI, React, and Claude Sonnet 4.5 via AWS Bedrock.
 
 ## System Architecture
 
@@ -26,10 +26,10 @@ An MVP web application that generates multiple-choice quizzes on any topic using
 
 ## AI Tool Selection
 
-**Model:** Claude Sonnet 4 (`us.anthropic.claude-sonnet-4-20250514-v1:0`) via AWS Bedrock.
+**Model:** Claude Sonnet 4.5 (`us.anthropic.claude-sonnet-4-5-20250929-v1:0`) via AWS Bedrock.
 
 **Reasoning:**
-- **Structured output quality** - Sonnet 4 reliably produces well-formed JSON without extra formatting, which is critical for programmatic quiz parsing
+- **Structured output quality** - Sonnet 4.5 reliably produces well-formed JSON without extra formatting, which is critical for programmatic quiz parsing
 - **Factual accuracy** - Strong reasoning capabilities produce plausible distractors and accurate correct answers, especially when augmented with Wikipedia context
 - **AWS-native integration** - Bedrock avoids managing API keys for a separate service; credentials flow through IAM, matching the existing deployment infrastructure
 - **Cost/latency balance** - Sonnet offers better question quality than Haiku at an acceptable latency (~3-5s per quiz generation)
