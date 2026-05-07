@@ -8,7 +8,7 @@ An MVP web application that generates multiple-choice quizzes on any topic using
 The user visits the home page and types a topic (e.g., "Photosynthesis", "Neural Networks", "Ancient Rome") into the input field, then clicks "Generate Quiz".
 
 ### 2. Wikipedia Retrieval (Context Injection)
-The backend first calls the Wikipedia REST API to fetch a summary for the topic. This summary provides factual reference material that gets injected into the LLM prompt. If Wikipedia has no matching article, the app skips this step and generates the quiz using only the model's training knowledge. This step takes under a second and significantly improves the factual accuracy of generated questions when a Wikipedia article is available.
+The backend calls the Wikipedia REST API at `https://en.wikipedia.org/api/rest_v1/page/summary/{topic}`, which returns a plain-text extract of the article's introductory section. This is a free, public API that requires no authentication or API key. The summary provides factual reference material that gets injected into the LLM prompt as grounding context. If Wikipedia has no matching article or the request times out (5-second limit), the app skips this step and generates the quiz using only the model's training knowledge. When a Wikipedia article is available, this step takes under a second and significantly improves the factual accuracy of generated questions.
 
 ### 3. LLM Quiz Generation
 The backend sends a structured prompt to Claude Sonnet 4.5 via AWS Bedrock, requesting exactly 5 multiple-choice questions in JSON format. The prompt includes the Wikipedia context (if available) and instructs the model to:
