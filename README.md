@@ -50,7 +50,41 @@ quiz_builder/
 
 4. **LLM Quiz Generation**
    - `backend/services/quiz_generator.py`
-   - Sends a structured prompt to Claude Sonnet 4.5 via AWS Bedrock with the Wikipedia context injected. Requests exactly 5 multiple-choice questions in JSON format.
+   - Sends the following prompt to Claude Sonnet 4.5 via AWS Bedrock (Wikipedia context injected when available):
+   ```
+   Generate a quiz about: {topic}
+
+   Use the following reference material to ensure factual accuracy:
+   ---
+   {wikipedia_summary}
+   ---
+
+   Create exactly 5 multiple-choice questions. Each question must have
+   4 options (A-D) with exactly one correct answer.
+
+   Respond with ONLY valid JSON in this exact format:
+   {
+     "questions": [
+       {
+         "question_text": "...",
+         "option_a": "...",
+         "option_b": "...",
+         "option_c": "...",
+         "option_d": "...",
+         "correct_answer": "A",
+         "explanation": "Brief explanation of why the correct answer
+                         is right and why the others are wrong."
+       }
+     ]
+   }
+
+   Rules:
+   - Questions should test understanding, not just recall
+   - Distractors should be plausible but clearly wrong
+   - Vary question difficulty (2 easy, 2 medium, 1 hard)
+   - Explanations should be 1-2 sentences
+   - correct_answer must be exactly one of: A, B, C, D
+   ```
 
 5. **Validate LLM Output**
    - `backend/services/quiz_generator.py`
@@ -59,7 +93,29 @@ quiz_builder/
 
 6. **Fact-Check Verification**
    - `backend/services/quiz_generator.py`
-   - A second LLM call reviews each question against the Wikipedia context and checks whether the marked correct answer is factually accurate. Fixes incorrect answers and updates explanations. The output is re-validated through Pydantic. If the verification call fails for any reason, falls back to the original unverified questions.
+   - A second LLM call reviews each question against the Wikipedia context and checks whether the marked correct answer is factually accurate. Sends the following prompt:
+   ```
+   You are a fact-checker. Review the following quiz questions about
+   "{topic}" and verify that each question's correct_answer is
+   factually accurate.
+
+   Reference material:
+   ---
+   {wikipedia_summary}
+   ---
+
+   Questions to verify:
+   {generated_questions_json}
+
+   For each question, determine if the marked correct_answer is truly
+   correct. If a question has an incorrect correct_answer, fix it by
+   changing the correct_answer field to the right letter and updating
+   the explanation.
+
+   Return all 5 questions. Keep questions unchanged if they are
+   correct. Only modify questions that have factual errors.
+   ```
+   - The output is re-validated through Pydantic. If the verification call fails for any reason, falls back to the original unverified questions.
 
 7. **Persist to Database**
    - `backend/routes/quiz.py`
