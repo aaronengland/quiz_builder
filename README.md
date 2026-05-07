@@ -36,39 +36,140 @@ quiz_builder/
 
 ## How It Works
 
-### 1. User Enters a Topic
-The user visits the home page and types a topic (e.g., "Photosynthesis", "Neural Networks", "Ancient Rome") into the input field, then clicks "Generate Quiz".
-
-### 2. Wikipedia Retrieval (Context Injection)
-The backend calls the Wikipedia REST API at `https://en.wikipedia.org/api/rest_v1/page/summary/{topic}`, which returns a plain-text extract of the article's introductory section. This is a free, public API that requires no authentication or API key. The summary provides factual reference material that gets injected into the LLM prompt as grounding context. If Wikipedia has no matching article or the request times out (5-second limit), the app skips this step and generates the quiz using only the model's training knowledge. When a Wikipedia article is available, this step takes under a second and significantly improves the factual accuracy of generated questions.
-
-### 3. LLM Quiz Generation
-The backend sends a structured prompt to Claude Sonnet 4.5 via AWS Bedrock, requesting exactly 5 multiple-choice questions in JSON format. The prompt includes the Wikipedia context (if available) and instructs the model to:
-- Create questions that test understanding, not just recall
-- Provide 4 plausible options (A-D) with one correct answer
-- Vary difficulty (2 easy, 2 medium, 1 hard)
-- Include a brief explanation for each correct answer
-
-The response is parsed and validated (exactly 5 questions, valid A-D answers).
-
-### 4. Answer Verification
-A second LLM call fact-checks the generated questions. The verifier receives the 5 questions along with the Wikipedia context and checks whether each marked correct answer is actually correct. If any question has a factual error, the verifier fixes the correct answer and updates the explanation. This two-pass approach (generate then verify) significantly reduces hallucinated answers. If the verification call fails for any reason, the app falls back to the original unverified questions so the user still gets their quiz.
-
-### 5. User Takes the Quiz
-The frontend navigates to the quiz page and displays the 5 questions. The API deliberately hides the correct answers at this stage, so users cannot cheat by inspecting network responses. The user selects one answer per question using radio buttons. A progress indicator shows how many questions have been answered.
-
-### 6. Quiz Submission and Scoring
-When the user submits, their answers are sent to the backend, which compares each selection against the stored correct answers and computes the score. The result (score, total, correct answers, user answers, and explanations) is saved to the database and returned to the frontend.
-
-### 7. Results Review
-The results page displays:
-- A color-coded score badge (e.g., 4/5, "Good job!")
-- Each question with the user's answer and the correct answer highlighted
-- A green left border for correct answers, red for incorrect
-- The AI-generated explanation for each question
-
-### 8. Quiz History
-Users can browse all past quizzes on the history page, which shows the topic, date, and most recent score for each quiz. From here they can retake any quiz or review their previous results.
+```
+                      ┌─────────────────────────────┐
+                      │   User Enters a Topic        │
+                      │   (Home.jsx)                 │
+                      └──────────────┬──────────────┘
+                                     │
+                                     v
+                      ┌─────────────────────────────┐
+                      │   Validate Request           │
+                      │   (schemas.py)               │
+                      │                              │
+                      │   Pydantic validates the     │
+                      │   request body, ensuring     │
+                      │   topic is a non-empty       │
+                      │   string. Rejects malformed  │
+                      │   requests with a 422 error. │
+                      └──────────────┬──────────────┘
+                                     │
+                                     v
+                      ┌─────────────────────────────┐
+                      │   Wikipedia Retrieval        │
+                      │   (wikipedia.py)             │
+                      │                              │
+                      │   Calls Wikipedia REST API   │
+                      │   to fetch a plain-text      │
+                      │   summary for the topic.     │
+                      │   5-second timeout. If no    │
+                      │   article found or timeout,  │
+                      │   continues without context. │
+                      └──────────────┬──────────────┘
+                                     │
+                                     v
+                      ┌─────────────────────────────┐
+                      │   LLM Quiz Generation        │
+                      │   (quiz_generator.py)        │
+                      │                              │
+                      │   Sends structured prompt    │
+                      │   to Claude Sonnet 4.5 via   │
+                      │   AWS Bedrock with Wikipedia │
+                      │   context injected. Requests │
+                      │   5 questions in JSON.       │
+                      └──────────────┬──────────────┘
+                                     │
+                                     v
+                      ┌─────────────────────────────┐
+                      │   Validate LLM Output        │
+                      │   (quiz_generator.py,        │
+                      │    schemas.py)               │
+                      │                              │
+                      │   Parses JSON response and   │
+                      │   validates each question    │
+                      │   through Pydantic model.    │
+                      │   Enforces: 5 questions,     │
+                      │   all fields present, valid  │
+                      │   A/B/C/D answer, correct    │
+                      │   data types.                │
+                      └──────────────┬──────────────┘
+                                     │
+                                     v
+                      ┌─────────────────────────────┐
+                      │   Fact-Check Verification    │
+                      │   (quiz_generator.py)        │
+                      │                              │
+                      │   Second LLM call reviews    │
+                      │   each question against the  │
+                      │   Wikipedia context. Fixes   │
+                      │   incorrect answers and      │
+                      │   updates explanations.      │
+                      │   Output re-validated        │
+                      │   through Pydantic. Falls    │
+                      │   back to originals on       │
+                      │   failure.                   │
+                      └──────────────┬──────────────┘
+                                     │
+                                     v
+                      ┌─────────────────────────────┐
+                      │   Persist to Database        │
+                      │   (routes/quiz.py,           │
+                      │    models.py, database.py)   │
+                      │                              │
+                      │   Saves quiz and questions   │
+                      │   to SQLite via SQLAlchemy.  │
+                      │   Returns quiz to frontend   │
+                      │   with answers hidden.       │
+                      └──────────────┬──────────────┘
+                                     │
+                                     v
+                      ┌─────────────────────────────┐
+                      │   User Takes the Quiz        │
+                      │   (Quiz.jsx,                 │
+                      │    QuestionCard.jsx)         │
+                      │                              │
+                      │   Displays 5 questions with  │
+                      │   radio buttons. Correct     │
+                      │   answers hidden from API    │
+                      │   response. Tracks progress. │
+                      └──────────────┬──────────────┘
+                                     │
+                                     v
+                      ┌─────────────────────────────┐
+                      │   Submit and Score           │
+                      │   (routes/quiz.py,           │
+                      │    schemas.py)               │
+                      │                              │
+                      │   Pydantic validates the     │
+                      │   submitted answers. Backend │
+                      │   compares against stored    │
+                      │   correct answers, computes  │
+                      │   score, persists result.    │
+                      └──────────────┬──────────────┘
+                                     │
+                                     v
+                      ┌─────────────────────────────┐
+                      │   Results Review             │
+                      │   (Results.jsx,              │
+                      │    ScoreDisplay.jsx)         │
+                      │                              │
+                      │   Color-coded score badge.   │
+                      │   Each question shows user   │
+                      │   answer vs. correct answer  │
+                      │   with AI explanation.       │
+                      └──────────────┬──────────────┘
+                                     │
+                                     v
+                      ┌─────────────────────────────┐
+                      │   Quiz History               │
+                      │   (History.jsx,              │
+                      │    routes/quiz.py)           │
+                      │                              │
+                      │   Browse past quizzes with   │
+                      │   topics, dates, and scores. │
+                      │   Retake or review any quiz. │
+                      └─────────────────────────────┘
+```
 
 ## System Architecture
 
