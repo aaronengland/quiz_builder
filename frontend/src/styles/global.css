@@ -204,6 +204,113 @@ body {
   color: var(--gray-300);
 }
 
+/* Quiz Page */
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.quiz-header h2 {
+  font-size: 1.5rem;
+}
+
+.quiz-progress {
+  color: var(--gray-500);
+  font-size: 0.9rem;
+}
+
+.question-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.question-number {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.question-text {
+  font-size: 1.05rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.option:hover {
+  border-color: var(--primary);
+  background: rgba(79, 70, 229, 0.03);
+}
+
+.option.selected {
+  border-color: var(--primary);
+  background: rgba(79, 70, 229, 0.06);
+}
+
+.option input[type="radio"] {
+  display: none;
+}
+
+.option-letter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--gray-100);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--gray-700);
+  flex-shrink: 0;
+}
+
+.option.selected .option-letter {
+  background: var(--primary);
+  color: white;
+}
+
+.option-text {
+  font-size: 0.95rem;
+}
+
+.submit-section {
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+.hint {
+  color: var(--gray-500);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
 /* Cards */
 .card {
   background: white;
@@ -230,5 +337,11 @@ body {
 
   .hero h1 {
     font-size: 1.5rem;
+  }
+
+  .quiz-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
   }
 }
