@@ -1,6 +1,7 @@
-# Quiz Builder - AI-Powered Knowledge Quiz Generator
+# Quiz Builder
+## AI-Powered Knowledge Quiz Generator
 
-**[Live Demo](https://6s9kx6uqpp.us-west-2.awsapprunner.com/)**
+**[Web App](https://6s9kx6uqpp.us-west-2.awsapprunner.com/)**
 
 An MVP web application that generates multiple-choice quizzes on any topic using AI. Built with FastAPI, React, and Claude Sonnet 4.5 via AWS Bedrock.
 
@@ -155,7 +156,7 @@ quiz_builder/
 - `questions` - question text, options A-D, correct answer, explanation (foreign key to quizzes)
 - `quiz_results` - score, total, user answers as JSON (foreign key to quizzes)
 
-**Deployment:** Multi-stage Docker build (Node for frontend, Python for backend) pushed to AWS ECR via a SageMaker notebook, then deployed on ECS Express. Health check at `/api/health`.
+**Deployment:** Multi-stage Docker build (Node for frontend, Python for backend) pushed to AWS ECR via a SageMaker notebook, then deployed on App Runner. Health check at `/api/health`.
 
 ## AI Tool Selection
 
@@ -240,7 +241,7 @@ Visit `http://localhost:5000`.
 
 ### AWS Deployment
 
-Upload the repo to SageMaker and run `notebook-ecr-image.ipynb` to build and push the Docker image to ECR. Then create an ECS Express service pointing to the ECR image with:
+Upload the repo to SageMaker and run `notebook-ecr-image.ipynb` to build and push the Docker image to ECR. Then create an App Runner service pointing to the ECR image with:
 - Container port: 5000
 - Health check path: `/api/health`
 - Environment variables: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`
