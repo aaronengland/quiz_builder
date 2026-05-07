@@ -8,6 +8,8 @@ from services.wikipedia import fetch_wikipedia_summary
 
 logger = logging.getLogger("quiz_builder")
 
+MAX_RETRIES = 3
+
 
 def _parse_and_validate(raw: str) -> list[dict]:
     """Parse LLM JSON response and validate each question through Pydantic."""
@@ -23,6 +25,30 @@ def _parse_and_validate(raw: str) -> list[dict]:
 
     validated = [GeneratedQuestion(**q).model_dump() for q in questions]
     return validated
+
+
+def _call_bedrock(bedrock_client, prompt: str) -> list[dict]:
+    """Call Bedrock and retry until the output passes validation."""
+    for attempt in range(1, MAX_RETRIES + 1):
+        response = bedrock_client.converse(
+            modelId="us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+            messages=[{"role": "user", "content": [{"text": prompt}]}],
+            inferenceConfig={"maxTokens": 2048},
+        )
+
+        raw = response["output"]["message"]["content"][0]["text"]
+
+        try:
+            return _parse_and_validate(raw)
+        except (json.JSONDecodeError, KeyError, ValueError, ValidationError) as exc:
+            logger.warning(
+                "LLM output validation failed (attempt %d/%d): %s",
+                attempt, MAX_RETRIES, exc,
+            )
+            if attempt == MAX_RETRIES:
+                raise ValueError(
+                    f"LLM output failed validation after {MAX_RETRIES} attempts"
+                ) from exc
 
 
 def _build_prompt(topic: str, wiki_context: str | None) -> str:
@@ -72,15 +98,7 @@ async def generate_quiz(topic: str, bedrock_client) -> list[dict]:
         logger.info("No Wikipedia context for '%s', generating without retrieval", topic)
 
     prompt = _build_prompt(topic, wiki_context)
-
-    response = bedrock_client.converse(
-        modelId="us.anthropic.claude-sonnet-4-5-20250929-v1:0",
-        messages=[{"role": "user", "content": [{"text": prompt}]}],
-        inferenceConfig={"maxTokens": 2048},
-    )
-
-    raw = response["output"]["message"]["content"][0]["text"]
-    questions = _parse_and_validate(raw)
+    questions = _call_bedrock(bedrock_client, prompt)
 
     # Verify factual accuracy with a second LLM call
     questions = await _verify_questions(questions, topic, wiki_context, bedrock_client)
@@ -135,15 +153,7 @@ async def _verify_questions(
     prompt = _build_verification_prompt(questions, topic, wiki_context)
 
     try:
-        response = bedrock_client.converse(
-            modelId="us.anthropic.claude-sonnet-4-5-20250929-v1:0",
-            messages=[{"role": "user", "content": [{"text": prompt}]}],
-            inferenceConfig={"maxTokens": 2048},
-        )
-
-        raw = response["output"]["message"]["content"][0]["text"]
-        verified = _parse_and_validate(raw)
-
+        verified = _call_bedrock(bedrock_client, prompt)
         logger.info("Quiz verification complete for '%s'", topic)
         return verified
 

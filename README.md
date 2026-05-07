@@ -86,14 +86,15 @@ quiz_builder/
    - correct_answer must be exactly one of: A, B, C, D
    ```
 
-5. **Validate LLM Output**
+5. **Validate LLM Output (with retry)**
    - `backend/services/quiz_generator.py`
    - `backend/schemas.py`
    - Parses the JSON response and validates each question through a Pydantic model (`GeneratedQuestion`). Enforces: exactly 5 questions, all fields present, `correct_answer` must be A/B/C/D, correct data types for every field.
+   - If validation fails (malformed JSON, missing fields, wrong types, invalid answer letter), the app automatically retries the LLM call up to 3 times. Each retry sends the same prompt and re-validates the new response. The app only returns an error to the user if all 3 attempts fail validation.
 
-6. **Fact-Check Verification**
+6. **Fact-Check Verification (with retry)**
    - `backend/services/quiz_generator.py`
-   - A second LLM call reviews each question against the Wikipedia context and checks whether the marked correct answer is factually accurate. Sends the following prompt:
+   - A second LLM call reviews each question against the Wikipedia context and checks whether the marked correct answer is factually accurate. The same retry logic applies: if the verification output fails Pydantic validation, it retries up to 3 times. If all retries fail, the app falls back to the original unverified questions. Sends the following prompt:
    ```
    You are a fact-checker. Review the following quiz questions about
    "{topic}" and verify that each question's correct_answer is
