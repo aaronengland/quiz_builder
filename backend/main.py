@@ -2,6 +2,7 @@ import logging
 import os
 import sys
 
+import boto3
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -10,6 +11,7 @@ from dotenv import load_dotenv
 
 from config import get_settings
 from database import engine, Base
+from routes.quiz import router as quiz_router, set_bedrock_client
 
 # Load .env from project root (one level up from backend/)
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
@@ -50,6 +52,18 @@ def create_app() -> FastAPI:
     @app.get("/api/health")
     async def health():
         return {"status": "ok"}
+
+    # Bedrock client
+    bedrock = boto3.client(
+        "bedrock-runtime",
+        region_name=os.environ.get("AWS_REGION", "us-west-2"),
+        aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID", ""),
+        aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY", ""),
+    )
+    set_bedrock_client(bedrock)
+
+    # Quiz routes
+    app.include_router(quiz_router)
 
     # Serve React frontend (SPA catch-all)
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
