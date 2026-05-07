@@ -173,7 +173,12 @@ quiz_builder/
 
 2. **JSON prompt strategy** - Rather than using Bedrock's tool_use for structured output, the prompt explicitly requests JSON and the backend strips markdown code fences if present. Simpler and sufficient for this format.
 
-3. **SQLite for persistence** - Eliminates external dependencies while demonstrating proper ORM usage and relational modeling. Switching to PostgreSQL only requires changing the connection string.
+3. **SQLite for persistence** - SQLite was chosen for this MVP for several reasons:
+   - **Zero infrastructure** - No external database server to provision, configure, or pay for. The database is a single file that lives alongside the application.
+   - **Self-contained demo** - A reviewer can clone the repo, install dependencies, and run the app immediately without setting up a database service.
+   - **Sufficient for the use case** - This is a single-user quiz app with low write volume. SQLite handles concurrent reads well and the write pattern (one quiz generation at a time) avoids SQLite's single-writer limitation.
+   - **Proper ORM usage** - Despite using SQLite, the app uses SQLAlchemy with relational models, foreign keys, and cascading deletes, demonstrating production-grade data modeling.
+   - **Easy migration path** - Switching to PostgreSQL (e.g., Amazon RDS) only requires changing the `DATABASE_URL` connection string in the environment. No code changes needed because SQLAlchemy abstracts the database engine. This would be the natural next step if the app needed to support multiple concurrent users or persistent storage across container restarts.
 
 4. **Session storage for results** - After submission, the full result is stored in `sessionStorage` so the results page loads instantly without an extra API call.
 
