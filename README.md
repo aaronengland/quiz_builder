@@ -173,18 +173,6 @@ quiz_builder/
 
 ## System Architecture
 
-```
-┌─────────────┐       ┌──────────────────┐       ┌──────────────┐
-│  React SPA  │──────>│  FastAPI Backend  │──────>│  AWS Bedrock  │
-│  (Vite)     │  /api │                  │       │  (Claude 4.5) │
-└─────────────┘       │  - Quiz routes   │       └──────────────┘
-                      │  - SQLite/SA     │
-                      │  - SPA serving   │──────>┌──────────────┐
-                      └──────────────────┘       │  Wikipedia   │
-                                                 │  REST API    │
-                                                 └──────────────┘
-```
-
 **Frontend:** React 18 + Vite + React Router. Four routes: home (topic input), quiz (answer questions), results (score + explanations), and history (past quizzes). Component-level state with `useState`/`useEffect` hooks. Vite dev server proxies `/api` requests to the backend.
 
 **Backend:** FastAPI with a modular structure. Quiz generation and Wikipedia retrieval are isolated services, separate from the API routes. SQLAlchemy ORM manages persistence. In production, Gunicorn runs 2 Uvicorn ASGI workers and serves the built React assets as static files.
