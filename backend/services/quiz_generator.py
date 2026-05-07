@@ -1,9 +1,28 @@
 import json
 import logging
 
+from pydantic import ValidationError
+
+from schemas import GeneratedQuestion
 from services.wikipedia import fetch_wikipedia_summary
 
 logger = logging.getLogger("quiz_builder")
+
+
+def _parse_and_validate(raw: str) -> list[dict]:
+    """Parse LLM JSON response and validate each question through Pydantic."""
+    cleaned = raw.strip()
+    if cleaned.startswith("```"):
+        cleaned = cleaned.split("\n", 1)[1].rsplit("```", 1)[0]
+
+    data = json.loads(cleaned)
+    questions = data["questions"]
+
+    if len(questions) != 5:
+        raise ValueError(f"Expected 5 questions, got {len(questions)}")
+
+    validated = [GeneratedQuestion(**q).model_dump() for q in questions]
+    return validated
 
 
 def _build_prompt(topic: str, wiki_context: str | None) -> str:
@@ -61,20 +80,73 @@ async def generate_quiz(topic: str, bedrock_client) -> list[dict]:
     )
 
     raw = response["output"]["message"]["content"][0]["text"]
+    questions = _parse_and_validate(raw)
 
-    # Strip markdown code fences if present
-    cleaned = raw.strip()
-    if cleaned.startswith("```"):
-        cleaned = cleaned.split("\n", 1)[1].rsplit("```", 1)[0]
-
-    data = json.loads(cleaned)
-    questions = data["questions"]
-
-    if len(questions) != 5:
-        raise ValueError(f"Expected 5 questions, got {len(questions)}")
-
-    for q in questions:
-        if q["correct_answer"] not in ("A", "B", "C", "D"):
-            raise ValueError(f"Invalid correct_answer: {q['correct_answer']}")
+    # Verify factual accuracy with a second LLM call
+    questions = await _verify_questions(questions, topic, wiki_context, bedrock_client)
 
     return questions
+
+
+def _build_verification_prompt(questions: list[dict], topic: str, wiki_context: str | None) -> str:
+    context_block = ""
+    if wiki_context:
+        context_block = (
+            "\nReference material:\n"
+            "---\n"
+            f"{wiki_context}\n"
+            "---\n"
+        )
+
+    questions_json = json.dumps(questions, indent=2)
+
+    return f"""You are a fact-checker. Review the following quiz questions about "{topic}" and verify that each question's correct_answer is factually accurate.
+{context_block}
+Questions to verify:
+{questions_json}
+
+For each question, determine if the marked correct_answer is truly correct. If a question has an incorrect correct_answer, fix it by changing the correct_answer field to the right letter and updating the explanation.
+
+Respond with ONLY valid JSON in this exact format:
+{{
+  "questions": [
+    {{
+      "question_text": "...",
+      "option_a": "...",
+      "option_b": "...",
+      "option_c": "...",
+      "option_d": "...",
+      "correct_answer": "A",
+      "explanation": "..."
+    }}
+  ]
+}}
+
+Return all 5 questions. Keep questions unchanged if they are correct. Only modify questions that have factual errors."""
+
+
+async def _verify_questions(
+    questions: list[dict],
+    topic: str,
+    wiki_context: str | None,
+    bedrock_client,
+) -> list[dict]:
+    """Make a second LLM call to fact-check the generated questions."""
+    prompt = _build_verification_prompt(questions, topic, wiki_context)
+
+    try:
+        response = bedrock_client.converse(
+            modelId="us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+            messages=[{"role": "user", "content": [{"text": prompt}]}],
+            inferenceConfig={"maxTokens": 2048},
+        )
+
+        raw = response["output"]["message"]["content"][0]["text"]
+        verified = _parse_and_validate(raw)
+
+        logger.info("Quiz verification complete for '%s'", topic)
+        return verified
+
+    except Exception as exc:
+        logger.warning("Verification failed for '%s': %s. Using unverified questions.", topic, exc)
+        return questions
