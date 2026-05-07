@@ -181,7 +181,18 @@ quiz_builder/
    - **Proper ORM usage** - Despite using SQLite, the app uses SQLAlchemy with relational models, foreign keys, and cascading deletes, demonstrating production-grade data modeling.
    - **Easy migration path** - Switching to PostgreSQL (e.g., Amazon RDS) only requires changing the `DATABASE_URL` connection string in the environment. No code changes needed because SQLAlchemy abstracts the database engine. This would be the natural next step if the app needed to support multiple concurrent users or persistent storage across container restarts.
 
-4. **Session storage for results** - After submission, the full result is stored in `sessionStorage` so the results page loads instantly without an extra API call.
+4. **Wikipedia summary vs. full article (chunking)** - The app uses Wikipedia's `/page/summary/` endpoint, which returns a concise 1-3 paragraph extract. This was a deliberate choice:
+   - **No chunking needed** - The summary is short enough to fit entirely in the LLM prompt alongside the generation instructions, well within the model's context window.
+   - **Higher signal-to-noise ratio** - The summary contains the most relevant facts about a topic without filler. Feeding the entire Wikipedia article would include sections (e.g., "See also", "References", footnotes) that add noise without improving question quality.
+   - **Lower latency** - A single lightweight API call (~100ms) vs. fetching and processing a full article.
+   - **Scaling to longer sources** - If the app needed to support longer documents (e.g., textbook chapters, research papers, or full Wikipedia articles), the approach would change:
+     1. Split the document into overlapping chunks (e.g., 500-token windows with 50-token overlap)
+     2. Generate embeddings for each chunk using an embedding model (e.g., Amazon Titan Embeddings via Bedrock)
+     3. Store embeddings in a vector database (e.g., Amazon OpenSearch Serverless, Pinecone, or pgvector)
+     4. At query time, embed the user's topic, retrieve the top-k most relevant chunks via similarity search, and inject only those chunks into the prompt
+   - This retrieval-augmented generation (RAG) pipeline would improve accuracy for niche topics while keeping prompt size manageable. For this MVP, the Wikipedia summary provides sufficient grounding without that complexity.
+
+5. **Session storage for results** - After submission, the full result is stored in `sessionStorage` so the results page loads instantly without an extra API call.
 
 ## API Endpoints
 
