@@ -2,6 +2,46 @@
 
 An MVP web application that generates multiple-choice quizzes on any topic using AI. Built with FastAPI, React, and Claude Sonnet 4.5 via AWS Bedrock.
 
+## Project Structure
+
+```
+quiz_builder/
+├── backend/
+│   ├── config.py                  # Pydantic settings (port, dev mode, database URL)
+│   ├── database.py                # SQLAlchemy engine, session factory, and base class
+│   ├── main.py                    # FastAPI app factory, Bedrock client setup, SPA serving
+│   ├── models.py                  # ORM models (Quiz, Question, QuizResult)
+│   ├── schemas.py                 # Pydantic request/response models for API validation
+│   ├── requirements.txt           # Python dependencies
+│   ├── routes/
+│   │   └── quiz.py                # API endpoints (generate, get, submit, list)
+│   └── services/
+│       ├── quiz_generator.py      # Bedrock prompt construction, API call, response parsing
+│       └── wikipedia.py           # Wikipedia REST API client for topic context retrieval
+├── frontend/
+│   ├── index.html                 # HTML entry point with font imports
+│   ├── package.json               # Node dependencies (React, React Router, Vite)
+│   ├── vite.config.js             # Vite config with /api proxy to backend
+│   └── src/
+│       ├── main.jsx               # React entry point with BrowserRouter
+│       ├── App.jsx                # Route definitions and navbar
+│       ├── components/
+│       │   ├── QuestionCard.jsx   # Single question with radio button options
+│       │   └── ScoreDisplay.jsx   # Color-coded score badge
+│       ├── pages/
+│       │   ├── Home.jsx           # Topic input and quiz generation trigger
+│       │   ├── Quiz.jsx           # Answer selection and submission
+│       │   ├── Results.jsx        # Score review with explanations
+│       │   └── History.jsx        # Past quiz list with retake/review links
+│       └── styles/
+│           └── global.css         # Base styles, component classes, responsive rules
+├── Dockerfile                     # Multi-stage build (Node frontend, Python backend)
+├── .dockerignore                  # Files excluded from Docker build context
+├── .gitignore                     # Files excluded from version control
+├── notebook-ecr-image.ipynb       # SageMaker notebook to build and push image to ECR
+└── README.md                      # This file
+```
+
 ## How It Works
 
 ### 1. User Enters a Topic
