@@ -43,7 +43,7 @@ quiz_builder/
 
 2. **Validate Request**
    - `backend/schemas.py`
-   - Pydantic validates the request body, ensuring topic is a non-empty string. Rejects malformed requests with a 422 error.
+   - Pydantic validates the request body, ensuring topic is a non-empty string with a maximum length of 200 characters. Rejects malformed requests with a 422 error.
 
 3. **Wikipedia Retrieval**
    - `backend/services/wikipedia.py`
@@ -219,6 +219,7 @@ Create a `.env` file in the project root:
 AWS_ACCESS_KEY_ID=your-access-key-here
 AWS_SECRET_ACCESS_KEY=your-secret-key-here
 AWS_REGION=us-west-2
+BEDROCK_MODEL_ID=us.anthropic.claude-sonnet-4-5-20250929-v1:0  # optional, defaults to Sonnet 4.5
 ```
 
 ### Local Development
@@ -256,3 +257,41 @@ Upload the repo to SageMaker and run `notebook-ecr-image.ipynb` to build and pus
 - Container port: 5000
 - Health check path: `/api/health`
 - Environment variables: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`
+
+## Anticipated Q&A
+
+**Q: Why did you choose Claude Sonnet 4.5 over other models?**
+Sonnet 4.5 hits the right balance for this use case. It reliably produces well-formed JSON (critical since the app parses LLM output programmatically), has strong factual reasoning for generating accurate quiz questions, and integrates natively with AWS Bedrock so there are no external API keys to manage. Haiku would be faster and cheaper but produces lower-quality distractors and explanations. Opus would be higher quality but adds latency and cost that isn't justified for a 5-question quiz.
+
+**Q: How do you prevent hallucinations in the generated questions?**
+Three layers: (1) Wikipedia context injection grounds the LLM in factual source material before generation, (2) a second LLM call acts as a fact-checker, reviewing each question against the Wikipedia context and correcting any inaccurate answers, and (3) Pydantic validation ensures the output structure is correct. The verification step is the most important - it catches cases where the model generates a plausible-sounding but incorrect answer.
+
+**Q: What happens if the LLM returns malformed output?**
+Every LLM call is wrapped in retry logic. The response is parsed and validated through a Pydantic model that enforces the exact schema: 5 questions, all fields present, `correct_answer` must be A/B/C/D, correct data types. If validation fails, the app retries the same prompt up to 3 times. Only after all retries are exhausted does it return an error. For the verification step specifically, if all retries fail, the app falls back to the original unverified questions rather than failing entirely.
+
+**Q: Why SQLite instead of PostgreSQL or DynamoDB?**
+SQLite is the right choice for an MVP demo. It requires zero infrastructure (no database server to provision), makes the app fully self-contained (a reviewer can clone and run immediately), and is sufficient for the write pattern (one quiz generation at a time). The app still uses SQLAlchemy with proper relational modeling, foreign keys, and cascading deletes. Switching to PostgreSQL only requires changing the `DATABASE_URL` connection string - no code changes - because SQLAlchemy abstracts the database engine. That would be the natural next step for multi-user or persistent storage needs.
+
+**Q: Why didn't you use chunking for the Wikipedia content?**
+The app uses Wikipedia's summary endpoint, which returns a concise 1-3 paragraph extract. This is intentionally short enough to fit entirely in the prompt without chunking, and has a higher signal-to-noise ratio than a full article. If the app needed to support longer sources (textbook chapters, research papers), I would implement a RAG pipeline: split documents into overlapping chunks, generate embeddings via Amazon Titan Embeddings, store them in a vector database, and retrieve only the most relevant chunks at query time via similarity search.
+
+**Q: How do you prevent users from cheating?**
+The `GET /api/quiz/{id}` endpoint returns questions through the `QuestionOut` Pydantic schema, which deliberately omits the `correct_answer` and `explanation` fields. These are only returned by the `POST /api/quiz/{id}/submit` endpoint after the user has committed their answers. Even inspecting the network response in browser dev tools won't reveal the answers before submission.
+
+**Q: Why FastAPI over Flask or Django?**
+FastAPI provides automatic request/response validation through Pydantic (which we use extensively), built-in async support (needed for the Wikipedia API call), auto-generated API docs at `/docs`, and strong type hints throughout. Flask would require adding these capabilities manually. Django would bring unnecessary complexity (admin panel, ORM migrations, template engine) for a lightweight API.
+
+**Q: How would you scale this for production?**
+Several changes: (1) swap SQLite for PostgreSQL on Amazon RDS for concurrent writes and persistent storage, (2) add user authentication (e.g., Cognito or Supabase Auth), (3) add rate limiting to prevent abuse of the Bedrock API, (4) cache Wikipedia summaries to reduce external API calls for repeated topics, (5) implement a full RAG pipeline for richer source material, and (6) add monitoring/observability with CloudWatch or similar.
+
+**Q: Why a monolithic Docker image instead of separate frontend/backend services?**
+For an MVP, a single container simplifies deployment (one App Runner service, one health check, one set of env vars). The frontend is just static files served by FastAPI, so there is no runtime overhead. In production, you would split them: serve the React build from CloudFront/S3 for global CDN caching, and run the API separately. But for a demo, the monolith is simpler to deploy and review.
+
+**Q: What tradeoffs did you make for the 2-day timeline?**
+The main tradeoffs were: (1) SQLite over a managed database, knowing the migration path is a one-line change, (2) no authentication since it is not required for the demo, (3) Wikipedia summary instead of a full RAG pipeline, which provides 80% of the accuracy benefit at 10% of the complexity, and (4) minimal UI styling since the instructions explicitly said UI polish is not the priority. Each tradeoff was chosen to maximize functionality within the time constraint while keeping a clear path to production improvements.
+
+**Q: How do you ensure data type consistency across the stack?**
+Pydantic models validate data at every boundary: incoming API requests (`GenerateRequest`, `SubmitRequest`), LLM output (`GeneratedQuestion`), and API responses (`QuizOut`, `SubmitResponse`). This means malformed data is caught immediately at the point of entry rather than causing downstream errors. SQLAlchemy column types provide a second layer of enforcement at the database level. Input length is also constrained (topic is capped at 200 characters) to prevent abuse of the LLM API.
+
+**Q: What if you need to swap the LLM model?**
+The Bedrock model ID is configurable via the `BEDROCK_MODEL_ID` environment variable, defaulting to Claude Sonnet 4.5. Switching to a different model (e.g., Haiku for lower cost, or a newer Claude release) only requires changing this environment variable. No code changes needed.

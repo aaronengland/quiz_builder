@@ -3,6 +3,7 @@ import logging
 
 from pydantic import ValidationError
 
+from config import get_settings
 from schemas import GeneratedQuestion
 from services.wikipedia import fetch_wikipedia_summary
 
@@ -31,7 +32,7 @@ def _call_bedrock(bedrock_client, prompt: str) -> list[dict]:
     """Call Bedrock and retry until the output passes validation."""
     for attempt in range(1, MAX_RETRIES + 1):
         response = bedrock_client.converse(
-            modelId="us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+            modelId=get_settings().bedrock_model_id,
             messages=[{"role": "user", "content": [{"text": prompt}]}],
             inferenceConfig={"maxTokens": 2048},
         )
