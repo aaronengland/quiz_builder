@@ -243,6 +243,8 @@ Only modify questions that have factual errors.
 
 ### 7. Persist Quiz to Database
 
+<img src="img/SQLite370.svg.png" alt="SQLite Logo" width="120">
+
 The validated questions are saved to SQLite before the user ever sees them.
 
 - A `Quiz` record (topic + timestamp) is created, then 5 `Question` records (question text, options A-D, correct answer, explanation) are linked to it via foreign key.
