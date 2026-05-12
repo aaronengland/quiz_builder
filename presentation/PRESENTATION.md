@@ -140,7 +140,7 @@ The only difference is the reference material block between the topic line and t
 
 ### 4. LLM Call #1 - Quiz Generation
 
-![Claude Logo](img/claude-logo.svg)
+<img src="img/claude-logo.svg" alt="Claude Logo" width="80">
 
 The prompt is sent to **Claude Sonnet 4.5** via **AWS Bedrock**.
 
