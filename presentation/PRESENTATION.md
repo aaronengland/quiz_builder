@@ -177,6 +177,8 @@ class GeneratedQuestion(BaseModel):
 
 ### 6. LLM Call #2 - Fact-Check Verification
 
+<img src="img/claude-logo.svg" alt="Claude Logo" width="80"> <img src="img/bedrock-color.png" alt="AWS Bedrock Logo" width="80">
+
 A second LLM call reviews the generated questions for factual accuracy. The generated questions are serialized as JSON and sent in a new prompt:
 
 ```
