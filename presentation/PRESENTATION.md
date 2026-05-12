@@ -402,3 +402,18 @@ CMD ["gunicorn", "main:app", \
 **Why a single image?** For an MVP, one container simplifies deployment: one App Runner service, one health check, one set of environment variables. The frontend is just static files served by FastAPI, so there's no runtime overhead.
 
 **Why SageMaker for the build?** The AWS credentials and Docker runtime are already available in SageMaker, so the notebook can build the image and push to ECR.
+
+---
+
+## Next Steps
+
+| Improvement | Description |
+|---|---|
+| **Durable persistence with PostgreSQL** | Replace SQLite with PostgreSQL on RDS so quiz history survives container restarts and scaling events |
+| **User authentication** | Add login (e.g., OAuth or email/password) so users can track their quiz history across sessions and devices |
+| **Configurable quiz length** | Let users choose the number of questions (e.g., 5, 10, 15) instead of a fixed 5 |
+| **Difficulty selection** | Allow users to pick a difficulty level (easy, medium, hard) that adjusts the prompt accordingly |
+| **Streaming responses** | Stream quiz generation progress to the frontend via SSE or WebSockets to reduce perceived wait time |
+| **Caching Wikipedia context** | Cache Wikipedia summaries to avoid redundant API calls for repeated topics |
+| **CI/CD pipeline** | Automate build, test, and deploy with GitHub Actions or AWS CodePipeline instead of manual SageMaker notebook builds |
+| **Quiz sharing** | Generate shareable links so users can challenge others with the same quiz |
