@@ -125,7 +125,20 @@ The prompt is sent to **Claude Sonnet 4.5** via **AWS Bedrock**.
 
 Every LLM response is parsed and validated before the app trusts it.
 
-- The raw response is cleaned (markdown code fences stripped if present), parsed as JSON, then each question is validated through the `GeneratedQuestion` Pydantic model.
+- The raw response is cleaned (markdown code fences stripped if present), parsed as JSON, then each question is validated through the `GeneratedQuestion` Pydantic model:
+
+```python
+class GeneratedQuestion(BaseModel):
+    """Validates a single question from the LLM response."""
+    question_text: str
+    option_a: str
+    option_b: str
+    option_c: str
+    option_d: str
+    correct_answer: Literal["A", "B", "C", "D"]
+    explanation: str | None = None
+```
+
 - Pydantic enforces: exactly 5 questions, all required fields present, `correct_answer` must be one of A/B/C/D (via `Literal` type), and correct data types throughout.
 - **If validation fails**, the app retries the LLM call - up to 3 total attempts. Each retry is a fresh Bedrock call, not a re-parse of the same output.
 - Only after all 3 attempts fail does the user see an error.
