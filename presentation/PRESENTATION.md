@@ -13,8 +13,6 @@
 ## Why Claude Sonnet 4.5?
 
 **Claude Sonnet 4.5** was chosen for its balance of quality, reliability, and cost:
-- **Structured output quality** - Reliably produces well-formed JSON, which is critical because the app parses LLM output programmatically
-- **Factual reasoning** - Generates accurate questions with plausible distractors, especially when grounded with Wikipedia context
 - **AWS-native** - Bedrock integration means credentials flow through IAM with no separate API keys to manage
 - **Cost/latency sweet spot** - Better question quality than Haiku at acceptable latency (~6-10s). Opus would add cost and latency not justified for a 5-question quiz
 
