@@ -295,8 +295,8 @@ class QuizOut(BaseModel):
     questions: list[QuestionOut]
 ```
 
-- `QuestionOut` contains the question text and options A-D but **excludes** `correct_answer` and `explanation`. This is an intentional anti-cheating measure: even inspecting the network response in browser dev tools will not reveal the answers before submission.
-- The React frontend (`Quiz.jsx`) renders 5 `QuestionCard` components, each with radio buttons for A-D. A progress indicator shows how many questions have been answered.
+- `QuestionOut` contains the question text and options A-D but **excludes** `correct_answer` and `explanation`.
+- The React frontend (`Quiz.jsx`) renders 5 `QuestionCard` components, each with radio buttons for A-D.
 
 ---
 
