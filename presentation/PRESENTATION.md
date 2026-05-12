@@ -48,7 +48,7 @@ class GenerateRequest(BaseModel):
 
 ### 2. Wikipedia API - Context Retrieval
 
-![Wikipedia Logo](img/Wikipedia-logo-v2.svg.webp)
+<img src="img/Wikipedia-logo-v2.svg.webp" alt="Wikipedia Logo" width="80">
 
 The backend fetches factual grounding material from Wikipedia before calling the LLM.
 
