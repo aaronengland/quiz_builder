@@ -258,7 +258,6 @@ Only modify questions that have factual errors.
 
 - The model checks whether each question's marked `correct_answer` is truly correct. If it finds an error, it corrects the answer and updates the explanation.
 - The verification output goes through the same `GeneratedQuestion` Pydantic validation and retry logic (up to 3 attempts).
-- **Graceful fallback:** If all verification retries fail, the app uses the original unverified questions rather than failing entirely. A slightly less-verified quiz is better than no quiz.
 
 ---
 
@@ -269,8 +268,7 @@ Only modify questions that have factual errors.
 The validated questions are saved to SQLite before the user ever sees them.
 
 - A `Quiz` record (topic + timestamp) is created, then 5 `Question` records (question text, options A-D, correct answer, explanation) are linked to it via foreign key.
-- **The database is SQLite** - chosen for this MVP because it requires zero infrastructure and makes the app fully self-contained. It persists for the lifetime of the container but does not survive App Runner container restarts. Switching to PostgreSQL (e.g., Amazon RDS) only requires changing the `DATABASE_URL` connection string; no code changes needed because SQLAlchemy abstracts the engine.
-
+- **The database is SQLite** - chosen for this MVP because it requires zero infrastructure and makes the app fully self-contained. 
 ---
 
 ### 8. Quiz Displayed on the Frontend (Answers Hidden)
