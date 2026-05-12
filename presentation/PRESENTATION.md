@@ -147,11 +147,64 @@ class GeneratedQuestion(BaseModel):
 
 ### 6. LLM Call #2 - Fact-Check Verification
 
-A second LLM call reviews the generated questions for factual accuracy.
+A second LLM call reviews the generated questions for factual accuracy. The generated questions are serialized as JSON and sent in a new prompt:
 
-- The verified questions, the original topic, and the Wikipedia context are sent to Claude in a new prompt that instructs the model to act as a fact-checker.
+```
+You are a fact-checker. Review the following quiz questions about "Neural
+Networks" and verify that each question's correct_answer is factually accurate.
+
+Reference material:
+---
+A neural network is a group of interconnected units called neurons that send
+signals to one another. Neurons can be either biological cells or mathematical
+models. While individual neurons are simple, many of them together in a network
+can perform complex tasks. There are two main types of neural networks.In
+neuroscience, a biological neural network is a physical structure found in
+brains and complex nervous systems - a population of nerve cells connected by
+synapses. In machine learning, an artificial neural network is a mathematical
+model used to approximate nonlinear functions. Artificial neural networks are
+used to solve artificial intelligence problems.
+---
+
+Questions to verify:
+[
+  {
+    "question_text": "What is the basic unit...",
+    "option_a": "...",
+    "option_b": "...",
+    "option_c": "...",
+    "option_d": "...",
+    "correct_answer": "A",
+    "explanation": "..."
+  },
+  ... (all 5 generated questions)
+]
+
+For each question, determine if the marked correct_answer is truly correct.
+If a question has an incorrect correct_answer, fix it by changing the
+correct_answer field to the right letter and updating the explanation.
+
+Respond with ONLY valid JSON in this exact format:
+{
+  "questions": [
+    {
+      "question_text": "...",
+      "option_a": "...",
+      "option_b": "...",
+      "option_c": "...",
+      "option_d": "...",
+      "correct_answer": "A",
+      "explanation": "..."
+    }
+  ]
+}
+
+Return all 5 questions. Keep questions unchanged if they are correct.
+Only modify questions that have factual errors.
+```
+
 - The model checks whether each question's marked `correct_answer` is truly correct. If it finds an error, it corrects the answer and updates the explanation.
-- The verification output goes through the same Pydantic validation and retry logic (up to 3 attempts).
+- The verification output goes through the same `GeneratedQuestion` Pydantic validation and retry logic (up to 3 attempts).
 - **Graceful fallback:** If all verification retries fail, the app uses the original unverified questions rather than failing entirely. A slightly less-verified quiz is better than no quiz.
 
 ---
