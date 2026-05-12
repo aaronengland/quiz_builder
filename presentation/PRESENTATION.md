@@ -12,6 +12,18 @@
 
 ![Sequence of Events Diagram](architecture_diagram.png)
 
+- [1. User Enters a Topic](#1-user-enters-a-topic)
+- [2. Wikipedia API - Context Retrieval](#2-wikipedia-api---context-retrieval)
+- [3. Prompt Construction - Context Injection](#3-prompt-construction---context-injection)
+- [4. LLM Call #1 - Quiz Generation](#4-llm-call-1---quiz-generation)
+- [5. Pydantic Validation (with Retry)](#5-pydantic-validation-with-retry)
+- [6. LLM Call #2 - Fact-Check Verification](#6-llm-call-2---fact-check-verification)
+- [7. Persist Quiz to Database](#7-persist-quiz-to-database)
+- [8. Quiz Displayed on the Frontend (Answers Hidden)](#8-quiz-displayed-on-the-frontend-answers-hidden)
+- [9. User Selects Answers and Submits](#9-user-selects-answers-and-submits)
+- [10. Scoring and Result Persistence](#10-scoring-and-result-persistence)
+- [11. Results Displayed on the Frontend](#11-results-displayed-on-the-frontend)
+
 ### 1. User Enters a Topic
 
 The user types a topic into the frontend (e.g., "Photosynthesis", "Neural Networks", "Ancient Rome") and clicks "Generate Quiz."
