@@ -63,7 +63,14 @@ class GenerateRequest(BaseModel):
     topic: str = Field(..., min_length=1, max_length=200)
 ```
 
-- This enforces that the topic is a non-empty string with a max length of 200 characters. Malformed requests are rejected with a 422 error before any processing begins.
+- FastAPI calls this automatically when the route is defined with it as a parameter:
+
+```python
+@router.post("/generate", response_model=QuizOut)
+async def generate(req: GenerateRequest, db: Session = Depends(get_db)):
+```
+
+- By type-hinting `req` as `GenerateRequest`, FastAPI parses the request body and validates it through Pydantic before the function runs. If validation fails, the user gets a 422 error before any processing begins.
 
 ---
 
