@@ -6,7 +6,7 @@
 
 **Stack:** FastAPI + React 18 + Claude Sonnet 4.5 + AWS Bedrock + SQLite + AWS App Runner
 
-<img src="img/fastapi.png" alt="FastAPI" width="100"> &nbsp;&nbsp;&nbsp; <img src="img/React-icon.svg.png" alt="React" width="60"> &nbsp;&nbsp;&nbsp; <img src="img/claude-logo.svg" alt="Claude" width="60"> &nbsp;&nbsp;&nbsp; <img src="img/bedrock-color.png" alt="AWS Bedrock" width="60"> &nbsp;&nbsp;&nbsp; <img src="img/SQLite370.svg.png" alt="SQLite" width="80"> &nbsp;&nbsp;&nbsp; <img src="img/docker.png" alt="Docker" width="60"> &nbsp;&nbsp;&nbsp; <img src="img/aws-apprunner--logo.png" alt="AWS App Runner" width="60">
+<img src="img/fastapi.png" alt="FastAPI" width="100"> &nbsp;&nbsp;&nbsp; <img src="img/React-icon.svg.png" alt="React" width="60"> &nbsp;&nbsp;&nbsp; <img src="img/claude-logo.svg" alt="Claude" width="60"> &nbsp;&nbsp;&nbsp; <img src="img/bedrock-color.png" alt="AWS Bedrock" width="60"> &nbsp;&nbsp;&nbsp; <img src="img/SQLite370.svg.png" alt="SQLite" width="80"> &nbsp;&nbsp;&nbsp; <img src="img/docker.png" alt="Docker" width="85"> &nbsp;&nbsp;&nbsp; <img src="img/aws-apprunner--logo.png" alt="AWS App Runner" width="60">
 
 ---
 
