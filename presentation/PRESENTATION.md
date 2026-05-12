@@ -407,4 +407,4 @@ CMD ["gunicorn", "main:app", \
 
 ## Next Steps
 
-The Wikipedia summary approach works well for common topics, but could be strengthened by pulling from multiple sources or using full-article RAG to handle niche subjects where the summary alone is too thin. On the infrastructure side, swapping SQLite for PostgreSQL on RDS would make quiz history durable across container restarts, and adding a CI/CD pipeline would replace the manual SageMaker build-and-push workflow with automated deployments on every merge.
+The Wikipedia summary approach works well for common topics, but could be strengthened by pulling from multiple sources or using full-article RAG to handle niche subjects where the summary alone is too thin. On the infrastructure side, swapping SQLite for PostgreSQL on RDS would make quiz history durable across container restarts.
