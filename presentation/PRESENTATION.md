@@ -12,6 +12,8 @@
 
 ![Sequence of Events Diagram](architecture_diagram.png)
 
+---
+
 - [1. User Enters a Topic](#1-user-enters-a-topic)
 - [2. Wikipedia API - Context Retrieval](#2-wikipedia-api---context-retrieval)
 - [3. Prompt Construction - Context Injection](#3-prompt-construction---context-injection)
@@ -23,6 +25,8 @@
 - [9. User Selects Answers and Submits](#9-user-selects-answers-and-submits)
 - [10. Scoring and Result Persistence](#10-scoring-and-result-persistence)
 - [11. Results Displayed on the Frontend](#11-results-displayed-on-the-frontend)
+
+---
 
 ### 1. User Enters a Topic
 
