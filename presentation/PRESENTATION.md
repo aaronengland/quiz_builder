@@ -73,10 +73,10 @@ class GenerateRequest(BaseModel):
 
 The backend fetches factual grounding material from Wikipedia before calling the LLM.
 
-- `wikipedia.py` sends an async GET request (via `httpx`) to `https://en.wikipedia.org/api/rest_v1/page/summary/{topic}`.
+- `wikipedia.py` sends a GET request (via `httpx`) to `https://en.wikipedia.org/api/rest_v1/page/summary/{topic}`.
 - This returns a concise 1-3 paragraph extract, which is the highest-signal content for any given topic.
-- The call has a 5-second timeout. If no article exists or the request fails, the quiz is still generated using the model's training knowledge alone. Wikipedia context is helpful but not required.
-- **Why summaries, not full articles?** The summary fits entirely in the LLM prompt without chunking, has a higher signal-to-noise ratio than a full article (no "See also" sections, footnotes, etc.), and takes ~100ms to fetch.
+- If no article exists or the request fails, the quiz is still generated using the model's training knowledge alone. Wikipedia context is helpful but not required.
+- **Why summaries, not full articles?** The summary fits entirely in the LLM prompt without chunking.
 
 ---
 
@@ -167,9 +167,7 @@ The only difference is the reference material block between the topic line and t
 
 The prompt is sent to **Claude Sonnet 4.5** via **AWS Bedrock**.
 
-- The backend calls `bedrock_client.converse()` with the constructed prompt.
 - The model generates 5 multiple-choice questions, each with 4 options (A-D), one correct answer, and an explanation.
-- **Why Claude Sonnet 4.5?** It reliably produces well-formed JSON (critical for programmatic parsing), has strong factual reasoning, and integrates natively with AWS Bedrock so credentials flow through IAM with no separate API keys.
 - **Temperature is left at the default (1.0).** This is intentional - it means a user can generate "Neural Networks" twice and get different questions each time, which is desirable for a quiz app. If the higher variance occasionally causes a format issue, the Pydantic validation + retry logic in step 5 catches it.
 
 ---
