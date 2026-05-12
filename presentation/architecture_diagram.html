@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Builder - Sequence of Events</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    min-height: 100vh;
+    padding: 48px 20px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: #f8fafc;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: #94a3b8;
+    margin-bottom: 56px;
+  }
+
+  .sequence {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ---- Step card ---- */
+  .step {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .step-badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-content {
+    flex: 1;
+    border-radius: 12px;
+    padding: 18px 24px;
+    background: #1e293b;
+    border-left: 4px solid;
+  }
+
+  .step-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .step-detail {
+    font-size: 13px;
+    color: #94a3b8;
+    line-height: 1.5;
+  }
+
+  .step-detail code {
+    background: #334155;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #e2e8f0;
+  }
+
+  .step-tech {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 20px;
+    margin-top: 8px;
+    margin-right: 4px;
+  }
+
+  /* ---- Color themes ---- */
+  /* Frontend - blue */
+  .theme-fe .step-badge { background: #2563eb; }
+  .theme-fe .step-content { border-color: #3b82f6; }
+  .theme-fe .step-title { color: #60a5fa; }
+  .theme-fe .step-tech { background: rgba(59,130,246,0.15); color: #60a5fa; }
+
+  /* Backend - green */
+  .theme-be .step-badge { background: #059669; }
+  .theme-be .step-content { border-color: #10b981; }
+  .theme-be .step-title { color: #34d399; }
+  .theme-be .step-tech { background: rgba(16,185,129,0.15); color: #34d399; }
+
+  /* External - amber */
+  .theme-ext .step-badge { background: #d97706; }
+  .theme-ext .step-content { border-color: #f59e0b; }
+  .theme-ext .step-title { color: #fbbf24; }
+  .theme-ext .step-tech { background: rgba(245,158,11,0.15); color: #fbbf24; }
+
+  /* Validation - rose */
+  .theme-val .step-badge { background: #e11d48; }
+  .theme-val .step-content { border-color: #f43f5e; border-style: solid solid solid dashed; }
+  .theme-val .step-title { color: #fb7185; }
+  .theme-val .step-tech { background: rgba(244,63,94,0.15); color: #fb7185; }
+
+  /* Database - purple */
+  .theme-db .step-badge { background: #7c3aed; }
+  .theme-db .step-content { border-color: #8b5cf6; }
+  .theme-db .step-title { color: #a78bfa; }
+  .theme-db .step-tech { background: rgba(139,92,246,0.15); color: #a78bfa; }
+
+  /* ---- Arrow connector ---- */
+  .arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 0;
+    margin-left: 19px;
+  }
+
+  .arrow svg {
+    width: 2px;
+    height: 36px;
+  }
+
+  .arrow-line {
+    width: 2px;
+    height: 36px;
+    background: #334155;
+    position: relative;
+    margin-left: 19px;
+  }
+
+  .arrow-line::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #334155;
+  }
+
+  /* ---- Callout ---- */
+  .callout {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-top: 6px;
+  }
+
+  .callout-warn {
+    background: rgba(244,63,94,0.15);
+    color: #fb7185;
+  }
+
+  .callout-ok {
+    background: rgba(16,185,129,0.15);
+    color: #34d399;
+  }
+
+  .callout-info {
+    background: rgba(59,130,246,0.15);
+    color: #60a5fa;
+  }
+
+  /* ---- Legend ---- */
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    margin-top: 48px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #94a3b8;
+  }
+
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .legend-dot.fe { background: #3b82f6; }
+  .legend-dot.be { background: #10b981; }
+  .legend-dot.ext { background: #f59e0b; }
+  .legend-dot.val { background: #f43f5e; }
+  .legend-dot.db { background: #8b5cf6; }
+</style>
+</head>
+<body>
+
+<h1>Quiz Builder - Sequence of Events</h1>
+<p class="subtitle">React 18 + FastAPI + Claude Sonnet 4.5 (AWS Bedrock) + SQLite</p>
+
+<div class="sequence">
+
+  <!-- Step 1 -->
+  <div class="step theme-fe">
+    <div class="step-badge">1</div>
+    <div class="step-content">
+      <div class="step-title">User Enters a Topic</div>
+      <div class="step-detail">
+        User types a topic (e.g., "Neural Networks") and clicks "Generate Quiz."
+        The React frontend sends <code>POST /api/quiz/generate</code>.
+        FastAPI validates through <code>GenerateRequest</code> Pydantic model (1-200 chars).
+      </div>
+      <span class="step-tech">React</span>
+      <span class="step-tech">FastAPI</span>
+      <span class="step-tech">Pydantic</span>
+    </div>
+  </div>
+
+  <div class="arrow-line"></div>
+
+  <!-- Step 2 -->
+  <div class="step theme-ext">
+    <div class="step-badge">2</div>
+    <div class="step-content">
+      <div class="step-title">Wikipedia API - Context Retrieval</div>
+      <div class="step-detail">
+        Async GET to <code>/api/rest_v1/page/summary/{topic}</code> via httpx.
+        Returns a 1-3 paragraph extract for factual grounding.
+        5-second timeout. If it fails, quiz still generates without it.
+      </div>
+      <span class="step-tech">httpx (async)</span>
+      <span class="step-tech">Wikipedia REST API</span>
+    </div>
+  </div>
+
+  <div class="arrow-line"></div>
+
+  <!-- Step 3 -->
+  <div class="step theme-be">
+    <div class="step-badge">3</div>
+    <div class="step-content">
+      <div class="step-title">Prompt Construction - Context Injection</div>
+      <div class="step-detail">
+        Wikipedia summary is injected into the prompt as reference material,
+        along with the JSON schema and generation rules (difficulty distribution,
+        distractor quality, explanation length). If no Wikipedia context, that
+        block is simply absent.
+      </div>
+      <span class="step-tech">quiz_generator.py</span>
+    </div>
+  </div>
+
+  <div class="arrow-line"></div>
+
+  <!-- Step 4 -->
+  <div class="step theme-ext">
+    <div class="step-badge">4</div>
+    <div class="step-content">
+      <div class="step-title">LLM Call #1 - Quiz Generation</div>
+      <div class="step-detail">
+        Prompt sent to Claude Sonnet 4.5 via <code>bedrock_client.converse()</code>.
+        Generates 5 multiple-choice questions with options A-D, correct answers,
+        and explanations.
+      </div>
+      <span class="step-tech">AWS Bedrock</span>
+      <span class="step-tech">Claude Sonnet 4.5</span>
+      <span class="callout callout-info">Temperature: 1.0 (varied quizzes per topic)</span>
+    </div>
+  </div>
+
+  <div class="arrow-line"></div>
+
+  <!-- Step 5 -->
+  <div class="step theme-val">
+    <div class="step-badge">5</div>
+    <div class="step-content">
+      <div class="step-title">Pydantic Validation (with Retry)</div>
+      <div class="step-detail">
+        Response cleaned (strip code fences), parsed as JSON, validated through
+        <code>GeneratedQuestion</code> model. Enforces: 5 questions, all fields
+        present, <code>correct_answer</code> must be <code>Literal["A","B","C","D"]</code>.
+      </div>
+      <span class="step-tech">Pydantic</span>
+      <span class="callout callout-warn">Retry up to 3x on validation failure</span>
+    </div>
+  </div>
+
+  <div class="arrow-line"></div>
+
+  <!-- Step 6 -->
+  <div class="step theme-ext">
+    <div class="step-badge">6</div>
+    <div class="step-content">
+      <div class="step-title">LLM Call #2 - Fact-Check Verification</div>
+      <div class="step-detail">
+        Generated questions + Wikipedia context sent in a new prompt.
+        Claude reviews each answer for factual accuracy and corrects errors.
+        Output re-validated through same <code>GeneratedQuestion</code> model.
+      </div>
+      <span class="step-tech">AWS Bedrock</span>
+      <span class="step-tech">Claude Sonnet 4.5</span>
+      <span class="callout callout-warn">Retry up to 3x</span>
+      <span class="callout callout-ok">Fallback: use unverified questions</span>
+    </div>
+  </div>
+
+  <div class="arrow-line"></div>
+
+  <!-- Step 7 -->
+  <div class="step theme-db">
+    <div class="step-badge">7</div>
+    <div class="step-content">
+      <div class="step-title">Persist Quiz to Database</div>
+      <div class="step-detail">
+        Quiz record (topic + timestamp) and 5 Question records (text, options,
+        correct answer, explanation) saved via SQLAlchemy with foreign keys and
+        cascading deletes.
+      </div>
+      <span class="step-tech">SQLite</span>
+      <span class="step-tech">SQLAlchemy</span>
+      <span class="callout callout-info">Ephemeral: container lifecycle only</span>
+    </div>
+  </div>
+
+  <div class="arrow-line"></div>
+
+  <!-- Step 8 -->
+  <div class="step theme-fe">
+    <div class="step-badge">8</div>
+    <div class="step-content">
+      <div class="step-title">Quiz Displayed on the Frontend (Answers Hidden)</div>
+      <div class="step-detail">
+        Response serialized through <code>QuizOut</code> + <code>QuestionOut</code>.
+        Questions and options A-D are shown, but <code>correct_answer</code> and
+        <code>explanation</code> are excluded. 5 QuestionCard components with radio buttons.
+      </div>
+      <span class="step-tech">React</span>
+      <span class="step-tech">Pydantic</span>
+      <span class="callout callout-warn">Answers hidden - anti-cheating</span>
+    </div>
+  </div>
+
+  <div class="arrow-line"></div>
+
+  <!-- Step 9 -->
+  <div class="step theme-fe">
+    <div class="step-badge">9</div>
+    <div class="step-content">
+      <div class="step-title">User Selects Answers and Submits</div>
+      <div class="step-detail">
+        Answers tracked in React state. Submit button disabled until all 5 answered.
+        Sends <code>POST /api/quiz/{id}/submit</code> with <code>SubmitRequest</code>:
+        a dict mapping question IDs to selected letters.
+      </div>
+      <span class="step-tech">React</span>
+      <span class="step-tech">FastAPI</span>
+      <span class="step-tech">Pydantic</span>
+    </div>
+  </div>
+
+  <div class="arrow-line"></div>
+
+  <!-- Step 10 -->
+  <div class="step theme-db">
+    <div class="step-badge">10</div>
+    <div class="step-content">
+      <div class="step-title">Scoring and Result Persistence</div>
+      <div class="step-detail">
+        User answers compared to stored <code>correct_answer</code> for each question.
+        Score computed (e.g., 4/5). QuizResult record persisted: quiz ID, score, total,
+        answers as JSON, timestamp.
+      </div>
+      <span class="step-tech">SQLite</span>
+      <span class="step-tech">SQLAlchemy</span>
+      <span class="callout callout-info">Persists for container lifetime only</span>
+    </div>
+  </div>
+
+  <div class="arrow-line"></div>
+
+  <!-- Step 11 -->
+  <div class="step theme-fe">
+    <div class="step-badge">11</div>
+    <div class="step-content">
+      <div class="step-title">Results Displayed on the Frontend</div>
+      <div class="step-detail">
+        <code>SubmitResponse</code> returns score + all questions via <code>QuestionWithAnswer</code>
+        (correct answers and explanations now revealed). Cached in sessionStorage.
+        Color-coded score badge + per-question review with green/red indicators.
+      </div>
+      <span class="step-tech">React</span>
+      <span class="step-tech">Pydantic</span>
+      <span class="callout callout-ok">Answers + explanations revealed</span>
+    </div>
+  </div>
+
+</div><!-- end sequence -->
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-item">
+    <div class="legend-dot fe"></div>
+    Frontend (React)
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot be"></div>
+    Backend (FastAPI)
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot ext"></div>
+    External API (Wikipedia / Bedrock)
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot val"></div>
+    Validation (Pydantic)
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot db"></div>
+    Database (SQLite)
+  </div>
+</div>
+
+</body>
+</html>

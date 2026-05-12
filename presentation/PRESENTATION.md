@@ -10,12 +10,21 @@
 
 ## Sequence of Events
 
+![Sequence of Events Diagram](architecture_diagram.png)
+
 ### 1. User Enters a Topic
 
 The user types a topic into the frontend (e.g., "Photosynthesis", "Neural Networks", "Ancient Rome") and clicks "Generate Quiz."
 
 - The React frontend (`Home.jsx`) sends a `POST /api/quiz/generate` request with the topic as the body.
-- FastAPI validates the request through the `GenerateRequest` Pydantic model, enforcing that the topic is a non-empty string with a max length of 200 characters. Malformed requests are rejected with a 422 error before any processing begins.
+- FastAPI validates the request through the `GenerateRequest` Pydantic model:
+
+```python
+class GenerateRequest(BaseModel):
+    topic: str = Field(..., min_length=1, max_length=200)
+```
+
+- This enforces that the topic is a non-empty string with a max length of 200 characters. Malformed requests are rejected with a 422 error before any processing begins.
 
 ---
 
