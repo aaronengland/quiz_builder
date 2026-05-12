@@ -286,18 +286,9 @@ class QuestionOut(BaseModel):
     option_c: str
     option_d: str
     # No correct_answer. No explanation.
-
-
-class QuizOut(BaseModel):
-    id: int
-    topic: str
-    created_at: datetime
-    questions: list[QuestionOut]
 ```
 
 - `QuestionOut` contains the question text and options A-D but **excludes** `correct_answer` and `explanation`.
-- `QuizOut` wraps the quiz metadata (id, topic, timestamp) with a list of `QuestionOut` objects - this is the "safe" view of a quiz that hides answers from the frontend.
-- The React frontend (`Quiz.jsx`) renders 5 `QuestionCard` components, each with radio buttons for A-D.
 
 ---
 
