@@ -32,13 +32,82 @@ The backend fetches factual grounding material from Wikipedia before calling the
 
 ### 3. Prompt Construction - Context Injection
 
-The Wikipedia summary is injected directly into the LLM prompt as reference material.
+The Wikipedia summary is injected directly into the LLM prompt as reference material. Here is the prompt before and after injection, using "Neural Networks" as an example topic.
 
-- `quiz_generator.py` builds a prompt that includes:
-  - The user's topic
-  - The Wikipedia extract (when available) as a grounding block
-  - An explicit JSON schema showing the exact output format
-  - Rules for question quality: test understanding (not just recall), plausible distractors, varied difficulty (2 easy, 2 medium, 1 hard), and 1-2 sentence explanations
+**Before injection (no Wikipedia context available):**
+
+```
+Generate a quiz about: Neural Networks
+
+Create exactly 5 multiple-choice questions. Each question must have 4 options (A-D) with exactly one correct answer.
+
+Respond with ONLY valid JSON in this exact format:
+{
+  "questions": [
+    {
+      "question_text": "...",
+      "option_a": "...",
+      "option_b": "...",
+      "option_c": "...",
+      "option_d": "...",
+      "correct_answer": "A",
+      "explanation": "Brief explanation of why the correct answer is right and why the others are wrong."
+    }
+  ]
+}
+
+Rules:
+- Questions should test understanding, not just recall
+- Distractors should be plausible but clearly wrong
+- Vary question difficulty (2 easy, 2 medium, 1 hard)
+- Explanations should be 1-2 sentences
+- correct_answer must be exactly one of: A, B, C, D
+```
+
+**After injection (Wikipedia context retrieved):**
+
+```
+Generate a quiz about: Neural Networks
+
+Use the following reference material to ensure factual accuracy:
+---
+A neural network is a group of interconnected units called neurons that send
+signals to one another. Neurons can be either biological cells or mathematical
+models. While individual neurons are simple, many of them together in a network
+can perform complex tasks. There are two main types of neural networks.In
+neuroscience, a biological neural network is a physical structure found in
+brains and complex nervous systems - a population of nerve cells connected by
+synapses. In machine learning, an artificial neural network is a mathematical
+model used to approximate nonlinear functions. Artificial neural networks are
+used to solve artificial intelligence problems.
+---
+
+Create exactly 5 multiple-choice questions. Each question must have 4 options (A-D) with exactly one correct answer.
+
+Respond with ONLY valid JSON in this exact format:
+{
+  "questions": [
+    {
+      "question_text": "...",
+      "option_a": "...",
+      "option_b": "...",
+      "option_c": "...",
+      "option_d": "...",
+      "correct_answer": "A",
+      "explanation": "Brief explanation of why the correct answer is right and why the others are wrong."
+    }
+  ]
+}
+
+Rules:
+- Questions should test understanding, not just recall
+- Distractors should be plausible but clearly wrong
+- Vary question difficulty (2 easy, 2 medium, 1 hard)
+- Explanations should be 1-2 sentences
+- correct_answer must be exactly one of: A, B, C, D
+```
+
+The only difference is the reference material block between the topic line and the instructions. When Wikipedia has no article for a topic, that block is simply absent and the LLM relies on its training knowledge alone.
 
 ---
 
