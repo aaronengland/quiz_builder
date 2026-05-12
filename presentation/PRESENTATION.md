@@ -6,7 +6,7 @@
 
 **Stack:** React 18 + FastAPI + Claude Sonnet 4.5 (AWS Bedrock) + SQLite
 
-<img src="img/React-icon.svg.png" alt="React" width="60"> <img src="img/fastapi.png" alt="FastAPI" width="60"> <img src="img/claude-logo.svg" alt="Claude" width="60"> <img src="img/bedrock-color.png" alt="AWS Bedrock" width="60"> <img src="img/SQLite370.svg.png" alt="SQLite" width="80">
+<img src="img/React-icon.svg.png" alt="React" width="60"> <img src="img/fastapi.png" alt="FastAPI" width="100"> <img src="img/claude-logo.svg" alt="Claude" width="60"> <img src="img/bedrock-color.png" alt="AWS Bedrock" width="60"> <img src="img/SQLite370.svg.png" alt="SQLite" width="80">
 
 ---
 
