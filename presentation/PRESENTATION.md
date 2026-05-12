@@ -414,6 +414,6 @@ CMD ["gunicorn", "main:app", \
      "--access-logfile", "-"]
 ```
 
-**Why a single image?** For an MVP, one container simplifies deployment: one App Runner service, one health check, one set of environment variables. The frontend is just static files served by FastAPI, so there's no runtime overhead. In production, you'd split them: React build on CloudFront/S3 for CDN caching, API on its own service.
+**Why a single image?** For an MVP, one container simplifies deployment: one App Runner service, one health check, one set of environment variables. The frontend is just static files served by FastAPI, so there's no runtime overhead.
 
-**Why SageMaker for the build?** The AWS credentials and Docker runtime are already available in SageMaker, so the notebook can build the image and push to ECR without any extra CI/CD setup.
+**Why SageMaker for the build?** The AWS credentials and Docker runtime are already available in SageMaker, so the notebook can build the image and push to ECR.
