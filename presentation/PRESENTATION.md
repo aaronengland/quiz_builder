@@ -46,6 +46,8 @@ class GenerateRequest(BaseModel):
 
 ### 2. Wikipedia API - Context Retrieval
 
+![Wikipedia Logo](img/Wikipedia-logo-v2.svg.webp)
+
 The backend fetches factual grounding material from Wikipedia before calling the LLM.
 
 - `wikipedia.py` sends an async GET request (via `httpx`) to `https://en.wikipedia.org/api/rest_v1/page/summary/{topic}`.
