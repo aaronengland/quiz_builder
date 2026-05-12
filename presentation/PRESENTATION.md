@@ -223,8 +223,27 @@ The validated questions are saved to SQLite before the user ever sees them.
 
 The backend returns the quiz to the frontend with correct answers deliberately omitted.
 
-- The `QuizOut` Pydantic response schema includes `QuestionOut`, which contains the question text and options A-D but **excludes** `correct_answer` and `explanation`.
-- This is an intentional anti-cheating measure: even inspecting the network response in browser dev tools will not reveal the answers before submission.
+- The response is serialized through these Pydantic schemas:
+
+```python
+class QuestionOut(BaseModel):
+    id: int
+    question_text: str
+    option_a: str
+    option_b: str
+    option_c: str
+    option_d: str
+    # No correct_answer. No explanation.
+
+
+class QuizOut(BaseModel):
+    id: int
+    topic: str
+    created_at: datetime
+    questions: list[QuestionOut]
+```
+
+- `QuestionOut` contains the question text and options A-D but **excludes** `correct_answer` and `explanation`. This is an intentional anti-cheating measure: even inspecting the network response in browser dev tools will not reveal the answers before submission.
 - The React frontend (`Quiz.jsx`) renders 5 `QuestionCard` components, each with radio buttons for A-D. A progress indicator shows how many questions have been answered.
 
 ---
