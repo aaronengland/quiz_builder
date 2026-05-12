@@ -20,7 +20,8 @@
 
 This app addresses two distinct risks when working with LLM output:
 
-- **Schema control (is the output structurally valid?)** is handled by **Pydantic**. Every LLM response is validated through the `GeneratedQuestion` model, which enforces: all required fields present, correct data types, and `correct_answer` restricted to A/B/C/D. If validation fails, the app retries the LLM call up to 3 times.
+- **Schema control (is the output structurally valid?)** is handled by **Pydantic**.
+  1. Every LLM response is validated through the `GeneratedQuestion` model, which enforces: all required fields present, correct data types, and `correct_answer` restricted to A/B/C/D. If validation fails, the app retries the LLM call up to 3 times.
 
 - **Hallucination control (is the output factually correct?)** is handled by two layers:
   1. **Wikipedia context injection** - Grounds the LLM in factual source material at generation time, reducing the chance of fabricated facts
