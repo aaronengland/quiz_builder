@@ -253,8 +253,14 @@ class QuizOut(BaseModel):
 The user selects one answer per question and clicks "Submit Quiz."
 
 - Answer selections are tracked in React component state (`useState` hook). The submit button is disabled until all 5 questions are answered.
-- On submit, the frontend sends a `POST /api/quiz/{id}/submit` request with the user's answers as a dictionary mapping question IDs to selected letters.
-- FastAPI validates the submission through the `SubmitRequest` Pydantic model.
+- On submit, the frontend sends a `POST /api/quiz/{id}/submit` request with the user's answers, validated through:
+
+```python
+class SubmitRequest(BaseModel):
+    answers: dict[str, str]  # { "question_id": "A", "question_id": "B", ... }
+```
+
+- The `answers` field is a dictionary mapping question IDs to the user's selected letters (A-D).
 
 ---
 
