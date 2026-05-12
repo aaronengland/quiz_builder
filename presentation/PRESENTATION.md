@@ -236,7 +236,6 @@ Only modify questions that have factual errors.
 The validated questions are saved to SQLite before the user ever sees them.
 
 - A `Quiz` record (topic + timestamp) is created, then 5 `Question` records (question text, options A-D, correct answer, explanation) are linked to it via foreign key.
-- SQLAlchemy manages the persistence with proper relational modeling, foreign keys, and cascading deletes.
 - **The database is SQLite** - chosen for this MVP because it requires zero infrastructure and makes the app fully self-contained. It persists for the lifetime of the container but does not survive App Runner container restarts. Switching to PostgreSQL (e.g., Amazon RDS) only requires changing the `DATABASE_URL` connection string; no code changes needed because SQLAlchemy abstracts the engine.
 
 ---
