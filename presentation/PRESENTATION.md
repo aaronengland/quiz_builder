@@ -118,6 +118,7 @@ The prompt is sent to **Claude Sonnet 4.5** via **AWS Bedrock**.
 - The backend calls `bedrock_client.converse()` with the constructed prompt.
 - The model generates 5 multiple-choice questions, each with 4 options (A-D), one correct answer, and an explanation.
 - **Why Claude Sonnet 4.5?** It reliably produces well-formed JSON (critical for programmatic parsing), has strong factual reasoning, and integrates natively with AWS Bedrock so credentials flow through IAM with no separate API keys.
+- **Temperature is left at the default (1.0).** This is intentional - it means a user can generate "Neural Networks" twice and get different questions each time, which is desirable for a quiz app. If the higher variance occasionally causes a format issue, the Pydantic validation + retry logic in step 5 catches it.
 
 ---
 
@@ -271,6 +272,7 @@ The backend compares the user's answers against the stored correct answers and s
 - For each question, the user's selected letter is compared to the `correct_answer` stored in the database. The score is computed as a simple count of correct answers out of 5.
 - A `QuizResult` record is persisted to the database containing: the quiz ID, score, total, the user's answers (as JSON), and a timestamp.
 - This persistence enables the History page - users can browse all past quizzes and see their scores.
+- **How long do results last?** The SQLite database is a file on the container's local filesystem. Results persist for as long as the App Runner container stays alive. When the container restarts (deploy, crash, scaling event, or idle shutdown), the file is gone and the database starts fresh. Switching to PostgreSQL on RDS would make persistence durable - and that's a one-line config change.
 
 ---
 
