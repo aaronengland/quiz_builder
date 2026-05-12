@@ -296,7 +296,6 @@ class QuestionOut(BaseModel):
 
 The user selects one answer per question and clicks "Submit Quiz."
 
-- Answer selections are tracked in React component state (`useState` hook). The submit button is disabled until all 5 questions are answered.
 - On submit, the frontend sends a `POST /api/quiz/{id}/submit` request with the user's answers, validated through:
 
 ```python
@@ -324,7 +323,6 @@ The backend compares the user's answers against the stored correct answers and s
 The submit response includes the full question data (now with correct answers and explanations revealed).
 
 - The `SubmitResponse` returns the score, all 5 questions via `QuestionWithAnswer` (which now includes `correct_answer` and `explanation`), and the user's submitted answers.
-- The frontend caches this result in `sessionStorage` for instant display on the Results page.
 - `Results.jsx` renders a color-coded score badge (e.g., "Excellent" for 5/5, "Keep learning" for 0-2/5) and each question shows:
   - The user's answer vs. the correct answer
   - Green/red visual indicators for correct/incorrect
