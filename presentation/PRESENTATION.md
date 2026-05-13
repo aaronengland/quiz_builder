@@ -51,7 +51,7 @@ Pydantic ensures the quiz is *well-formed*. Wikipedia + the verification call en
 
 ---
 
-### 1. User Enters a Topic
+### 1. [User Enters a Topic](https://github.com/aaronengland/quiz_builder/blob/main/frontend/src/pages/Home.jsx)
 
 The user types a topic into the frontend (e.g., "Photosynthesis", "Neural Networks", "Ancient Rome") and clicks "Generate Quiz."
 
