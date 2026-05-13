@@ -10,6 +10,14 @@
 
 ---
 
+## Why FastAPI Backend and React Frontend?
+
+- **Mobile-ready via Capacitor** - React's component-based frontend can be wrapped with Capacitor to ship as a native iOS/Android app with minimal code changes, turning one codebase into both a web app and a mobile app
+- **Async-first backend** - FastAPI's native `async/await` support handles concurrent LLM calls (generation + verification) without blocking, which matters when each call takes 6-10 seconds
+- **Decoupled architecture** - A REST API backend with a separate frontend means the same API could serve a mobile app, a CLI tool, or a third-party integration without rewriting business logic
+
+---
+
 ## Why Claude Sonnet 4.5?
 
 **Claude Sonnet 4.5** was chosen for its balance of quality, reliability, and cost:
