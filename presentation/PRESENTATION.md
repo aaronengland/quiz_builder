@@ -16,7 +16,7 @@
 - **AWS-native** - Bedrock integration means credentials flow through IAM with no separate API keys to manage
 - **Cost/latency sweet spot** - Better question quality than Haiku at acceptable latency (~6-10s). Opus would add cost and latency not justified for a 5-question quiz
 
-## [Schema Control](https://github.com/aaronengland/quiz_builder/blob/main/backend/schemas.py) vs. Hallucination Control
+## [Schema Control](https://github.com/aaronengland/quiz_builder/blob/main/backend/schemas.py) vs. [Hallucination Control](https://github.com/aaronengland/quiz_builder/blob/main/backend/services/quiz_generator.py)
 
 This app addresses two distinct risks when working with LLM output:
 
