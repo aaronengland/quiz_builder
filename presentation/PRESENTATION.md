@@ -420,7 +420,12 @@ The Wikipedia summary approach works well for common topics, but could be streng
 
 ## Appendix: Claude Code Skill to Recreate the App
 
-The following is a Claude Code custom skill prompt that could be used to scaffold the entire quiz builder application from scratch:
+The following is a Claude Code custom skill prompt that could be used to scaffold the entire quiz builder application from scratch.
+
+**How to use it:**
+1. Save the prompt below to a file at `.claude/commands/build-quiz-app.md` in your project directory
+2. Open Claude Code in the terminal and type `/build-quiz-app`
+3. Claude will read the skill and begin scaffolding the full app
 
 ```
 Build a full-stack quiz builder app with the following architecture:
