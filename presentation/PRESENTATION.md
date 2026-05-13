@@ -172,7 +172,7 @@ The prompt is sent to **Claude Sonnet 4.5** via **AWS Bedrock**.
 
 ---
 
-### 5. Pydantic Validation (with Retry)
+### 5. [Pydantic Validation (with Retry)](https://github.com/aaronengland/quiz_builder/blob/main/backend/services/quiz_generator.py)
 
 Every LLM response is parsed and validated before the app trusts it.
 
