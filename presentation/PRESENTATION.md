@@ -271,7 +271,7 @@ The validated questions are saved to SQLite before the user ever sees them.
 - **The database is SQLite** - chosen for this MVP because it requires zero infrastructure and makes the app fully self-contained. 
 ---
 
-### 8. Quiz Displayed on the Frontend (Answers Hidden)
+### 8. [Quiz Displayed on the Frontend (Answers Hidden)](https://github.com/aaronengland/quiz_builder/blob/main/frontend/src/pages/Quiz.jsx)
 
 The backend returns the quiz to the frontend with correct answers deliberately omitted.
 
