@@ -80,7 +80,7 @@ The backend fetches factual grounding material from Wikipedia before calling the
 
 ---
 
-### 3. Prompt Construction - Context Injection
+### 3. [Prompt Construction - Context Injection](https://github.com/aaronengland/quiz_builder/blob/main/backend/services/quiz_generator.py)
 
 The Wikipedia summary is injected directly into the LLM prompt as reference material. Here is the prompt before and after injection, using "Neural Networks" as an example topic.
 
