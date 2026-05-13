@@ -10,7 +10,7 @@
 
 ---
 
-## Why FastAPI Backend and React Frontend?
+## Why [FastAPI Backend](https://github.com/aaronengland/quiz_builder/blob/main/backend/main.py) and [React Frontend](https://github.com/aaronengland/quiz_builder/tree/main/frontend/src/pages)?
 
 - **Mobile-ready via Capacitor** - React's component-based frontend can be wrapped with Capacitor to ship as a native iOS/Android app with minimal code changes, turning one codebase into both a web app and a mobile app
 - **Async-first backend** - FastAPI's native `async/await` support handles concurrent LLM calls (generation + verification) without blocking, which matters when each call takes 6-10 seconds
