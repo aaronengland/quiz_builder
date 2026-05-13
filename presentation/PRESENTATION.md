@@ -318,7 +318,7 @@ The backend compares the user's answers against the stored correct answers and s
 
 ---
 
-### 11. Results Displayed on the Frontend
+### 11. [Results Displayed on the Frontend](https://github.com/aaronengland/quiz_builder/blob/main/frontend/src/pages/Results.jsx)
 
 The submit response includes the full question data (now with correct answers and explanations revealed).
 
