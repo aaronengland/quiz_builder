@@ -351,7 +351,7 @@ The submit response includes the full question data (now with correct answers an
 
 ---
 
-## Docker Image & Deployment
+## [Docker Image & Deployment](https://github.com/aaronengland/quiz_builder/blob/main/notebook-ecr-image.ipynb)
 
 The app ships as a single **multi-stage Docker image** built via a SageMaker notebook and pushed to AWS ECR, then deployed on App Runner.
 
