@@ -307,7 +307,7 @@ class SubmitRequest(BaseModel):
 
 ---
 
-### 10. Scoring and Result Persistence
+### 10. [Scoring and Result Persistence](https://github.com/aaronengland/quiz_builder/blob/main/backend/routes/quiz.py)
 
 The backend compares the user's answers against the stored correct answers and saves the result.
 
