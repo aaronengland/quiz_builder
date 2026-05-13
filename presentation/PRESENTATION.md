@@ -196,7 +196,7 @@ class GeneratedQuestion(BaseModel):
 
 ---
 
-### 6. LLM Call #2 - Fact-Check Verification
+### 6. [LLM Call #2 - Fact-Check Verification](https://github.com/aaronengland/quiz_builder/blob/main/backend/services/quiz_generator.py)
 
 <img src="img/claude-logo.svg" alt="Claude Logo" width="80"> <img src="img/bedrock-color.png" alt="AWS Bedrock Logo" width="80">
 
