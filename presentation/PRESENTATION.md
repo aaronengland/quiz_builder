@@ -261,7 +261,7 @@ Only modify questions that have factual errors.
 
 ---
 
-### 7. Persist Quiz to Database
+### 7. [Persist Quiz to Database](https://github.com/aaronengland/quiz_builder/blob/main/backend/routes/quiz.py)
 
 <img src="img/SQLite370.svg.png" alt="SQLite Logo" width="120">
 
