@@ -67,7 +67,7 @@ class GenerateRequest(BaseModel):
 
 ---
 
-### 2. Wikipedia API - Context Retrieval
+### 2. [Wikipedia API - Context Retrieval](https://github.com/aaronengland/quiz_builder/blob/main/backend/services/wikipedia.py)
 
 <img src="img/Wikipedia-logo-v2.svg.webp" alt="Wikipedia Logo" width="80">
 
