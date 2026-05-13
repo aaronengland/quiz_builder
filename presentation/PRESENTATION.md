@@ -161,7 +161,7 @@ The only difference is the reference material block between the topic line and t
 
 ---
 
-### 4. LLM Call #1 - Quiz Generation
+### 4. [LLM Call #1 - Quiz Generation](https://github.com/aaronengland/quiz_builder/blob/main/backend/routes/quiz.py)
 
 <img src="img/claude-logo.svg" alt="Claude Logo" width="80"> <img src="img/bedrock-color.png" alt="AWS Bedrock Logo" width="80">
 
