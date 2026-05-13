@@ -414,4 +414,4 @@ CMD ["gunicorn", "main:app", \
 
 ## Next Steps
 
-The Wikipedia summary approach works well for common topics, but could be strengthened by pulling from multiple sources or using full-article RAG to handle niche subjects where the summary alone is too thin. On the infrastructure side, swapping SQLite for PostgreSQL on RDS would make quiz history durable across container restarts.
+The Wikipedia summary approach works well for common topics, but could be strengthened by pulling from multiple sources or using full-article RAG to handle niche subjects where the summary alone is too thin. On the infrastructure side, swapping SQLite for PostgreSQL on RDS would make quiz history durable across container restarts. The fact-check verification step currently makes a single LLM call with no retry, falling back to unverified questions on failure; adding the same retry logic used in quiz generation would improve accuracy consistency.
