@@ -415,3 +415,74 @@ CMD ["gunicorn", "main:app", \
 ## Next Steps
 
 The Wikipedia summary approach works well for common topics, but could be strengthened by pulling from multiple sources or using full-article RAG to handle niche subjects where the summary alone is too thin. On the infrastructure side, swapping SQLite for PostgreSQL on RDS would make quiz history durable across container restarts. The fact-check verification step currently makes a single LLM call with no retry, falling back to unverified questions on failure; adding the same retry logic used in quiz generation would improve accuracy consistency.
+
+---
+
+## Appendix: Claude Code Skill to Recreate the App
+
+The following is a Claude Code custom skill prompt that could be used to scaffold the entire quiz builder application from scratch:
+
+```
+Build a full-stack quiz builder app with the following architecture:
+
+**Backend (FastAPI + Python 3.11):**
+- main.py: FastAPI app with CORS middleware, Bedrock client initialization, and SPA
+  catch-all to serve the React frontend build
+- config.py: Pydantic Settings class loading from environment variables (PORT, DATABASE_URL,
+  BEDROCK_MODEL_ID defaulting to Claude Sonnet 4.5)
+- database.py: SQLAlchemy engine, session factory, and declarative Base
+- models.py: Three ORM models with relationships:
+  - Quiz (id, topic, created_at) -> has many Questions
+  - Question (id, quiz_id FK, question_text, option_a/b/c/d, correct_answer, explanation)
+  - QuizResult (id, quiz_id FK, score, total, answers JSON, submitted_at)
+- schemas.py: Pydantic models for:
+  - GenerateRequest (topic: str, min_length=1, max_length=200)
+  - GeneratedQuestion (validates LLM output, correct_answer: Literal["A","B","C","D"])
+  - QuestionOut (excludes correct_answer and explanation for anti-cheating)
+  - QuestionWithAnswer (includes correct_answer and explanation, revealed after submit)
+  - QuizOut, SubmitRequest, SubmitResponse, QuizSummary
+- routes/quiz.py: Five endpoints:
+  - POST /api/quiz/generate: generates quiz from topic
+  - GET /api/quiz/{id}: retrieves quiz (answers hidden)
+  - POST /api/quiz/{id}/submit: scores answers, persists result
+  - GET /api/quiz/history: lists all quizzes with latest scores
+  - GET /api/quiz/{id}/results: retrieves past result
+- services/wikipedia.py: async httpx GET to Wikipedia REST API
+  (/api/rest_v1/page/summary/{topic}), 5-second timeout, returns None on failure
+- services/quiz_generator.py:
+  - _call_bedrock(): calls AWS Bedrock converse(), retries up to 3x until output
+    passes Pydantic validation
+  - _build_verification_prompt(): constructs a fact-check prompt with the generated
+    questions and Wikipedia context
+  - _verify_questions(): second LLM call to review answers for factual accuracy,
+    falls back to unverified questions on failure
+  - generate_quiz(): orchestrates Wikipedia fetch, quiz generation, validation, and
+    verification
+
+**Frontend (React 18 + React Router):**
+- App.jsx: navbar with active link highlighting, routes for /, /quiz/:id, /results/:id,
+  /history
+- pages/Home.jsx: topic input form, calls POST /api/quiz/generate, navigates to quiz on
+  success
+- pages/Quiz.jsx: renders 5 QuestionCard components with radio buttons, submit button
+  disabled until all answered
+- pages/Results.jsx: color-coded score badge, per-question review with green/red indicators,
+  correct answers and explanations revealed
+- pages/History.jsx: lists all past quizzes with scores
+- components/QuestionCard.jsx: single question with 4 radio options
+- components/ScoreDisplay.jsx: score breakdown display
+
+**Key behaviors:**
+- LLM output is always validated through Pydantic before the app trusts it
+- If validation fails, retry the LLM call (up to 3 total attempts), not a re-parse
+- Answers are never sent to the frontend until the user submits (separate Pydantic schemas)
+- Wikipedia context is optional; quiz still generates without it
+- Temperature stays at default (1.0) for varied quizzes on the same topic
+- Use SQLite for persistence (zero infrastructure MVP)
+
+**Dockerfile (multi-stage):**
+- Stage 1: node:20-alpine, npm install + npm run build for React
+- Stage 2: python:3.11-slim, pip install backend deps, copy backend source, copy frontend
+  build into ./frontend_build
+- CMD: gunicorn with uvicorn workers on port 5000
+```
