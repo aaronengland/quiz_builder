@@ -337,7 +337,6 @@ The submit response includes the full question data (now with correct answers an
 | **Two-step LLM (generate + verify)** | Catches factually incorrect answers; falls back gracefully if verification fails |
 | **Pydantic at every boundary** | Validates requests, LLM output, responses, and app config with a single consistent pattern |
 | **Retry logic on LLM calls** | LLMs are non-deterministic; retrying up to 3x with re-validation handles transient format failures |
-| **Answers hidden until submit** | Separate Pydantic schemas (`QuestionOut` vs `QuestionWithAnswer`) prevent cheating via dev tools |
 | **Wikipedia summary (not full RAG)** | 80% of accuracy benefit at 10% of complexity; fits in prompt without chunking |
 | **SQLite for MVP** | Zero infrastructure, self-contained; migration to PostgreSQL is a one-line config change |
 | **JSON prompting (not tool_use)** | For a fixed, simple schema, raw JSON prompting + Pydantic validation is simpler and sufficient |
