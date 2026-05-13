@@ -292,7 +292,7 @@ class QuestionOut(BaseModel):
 
 ---
 
-### 9. User Selects Answers and Submits
+### 9. [User Selects Answers and Submits](https://github.com/aaronengland/quiz_builder/blob/main/backend/routes/quiz.py)
 
 The user selects one answer per question and clicks "Submit Quiz."
 
